@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.PremierLeague.model.Model;
+import it.polito.tdp.PremierLeague.model.Team;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -35,7 +36,7 @@ public class FXMLController {
     private Button btnSimula; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbSquadra"
-    private ComboBox<?> cmbSquadra; // Value injected by FXMLLoader
+    private ComboBox<Team> cmbSquadra; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtN"
     private TextField txtN; // Value injected by FXMLLoader
@@ -48,17 +49,35 @@ public class FXMLController {
 
     @FXML
     void doClassifica(ActionEvent event) {
-
+    	Team t=cmbSquadra.getValue();
+    	if(t!=null) {
+    		txtResult.setText(model.getSquadreMigliori(t));
+    		txtResult.appendText("\n"+model.getSquadrePeggiori(t));
+    	}else {
+    		txtResult.setText("Inserisci un team!");
+    		return;
+    	}
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    	txtResult.clear();
+    	model.creaGrafo();
+    	txtResult.setText("GRAFO CREATO!\n#Vertici: "+model.getNVertex()+"\n#Archi: "+model.getNEdges());
+    	for(Team t:model.getVertex())
+    	cmbSquadra.getItems().addAll(t);
     }
 
     @FXML
     void doSimula(ActionEvent event) {
-
+    	txtResult.clear();
+    	try {
+    	int n=Integer.parseInt(txtN.getText());	
+    	int soglia=Integer.parseInt(txtX.getText());
+    	txtResult.setText(model.simula(n, soglia));
+    	}catch(NumberFormatException e) {
+    		txtResult.setText("Inserisci dei valori validi!");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
