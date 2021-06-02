@@ -1,5 +1,7 @@
 package it.polito.tdp.PremierLeague.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +11,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
 import it.polito.tdp.PremierLeague.db.PremierLeagueDAO;
+import it.polito.tdp.PremierLeague.model.Model.ComparatoreSquadrePeggiori;
 
 public class Simulator {
 
@@ -55,24 +58,24 @@ public class Simulator {
 					int prob=(int)(Math.random()*100);
 					if(prob<=50) {
 						if(p.getT1().getReporter()>0) {
+						List<Team>squadreMigliori=this.getSquadreMigliori(p.getT1());
+						int squadre=(int)(Math.random()*squadreMigliori.size());
+						if(squadreMigliori.size()!=0) {
+						Team t=squadreMigliori.get(squadre);
 						p.getT1().menoReporter();
-						for(Team t:idMap.values()) {
-							if(t.getPuntiClassifica()>p.getT1().getPuntiClassifica()) {
-								t.plusReporter();
-								break;
-							}
+						t.plusReporter();
 						}
 						}
 					}
 					int prob1=(int)(Math.random()*100);
 					if(prob1<=20) {
 						int nRep=(int)(Math.random()*p.getT2().getReporter());
+						List<Team>squadrePeggiori=this.getSquadrePeggiori(p.getT2());
+						int squadre=(int)(Math.random()*squadrePeggiori.size());
+						if(squadrePeggiori.size()!=0) {
+						Team t=squadrePeggiori.get(squadre);
 						p.getT2().setReporter(p.getT2().getReporter()-nRep);
-						for(Team t:idMap.values()) {
-							if(t.getPuntiClassifica()<p.getT2().getPuntiClassifica()) {
-								t.setReporter(t.getReporter()+nRep);
-								break;
-							}
+						t.setReporter(t.getReporter()+nRep);
 						}
 					}
 					break;
@@ -80,24 +83,24 @@ public class Simulator {
 					int prob2=(int)(Math.random()*100);
 					if(prob2<=50) {
 						if(p.getT2().getReporter()>0) {
-						p.getT2().menoReporter();
-						for(Team t:idMap.values()) {
-							if(t.getPuntiClassifica()>p.getT2().getPuntiClassifica()) {
+						List<Team>squadreMigliori=this.getSquadreMigliori(p.getT2());
+						int squadre=(int)(Math.random()*squadreMigliori.size());
+						if(squadreMigliori.size()!=0) {
+						Team t=squadreMigliori.get(squadre);
 								t.plusReporter();
-								break;
-							}
+								p.getT2().menoReporter();
 						}
 						}
 					}
 					int prob3=(int)(Math.random()*100);
 					if(prob3<=20) {
 						int nRep=(int)(Math.random()*p.getT1().getReporter());
+						List<Team>squadrePeggiori=this.getSquadrePeggiori(p.getT2());
+						int squadre=(int)(Math.random()*squadrePeggiori.size());
+						if(squadrePeggiori.size()!=0) {
+						Team t=squadrePeggiori.get(squadre);
 						p.getT1().setReporter(p.getT1().getReporter()-nRep);
-						for(Team t:idMap.values()) {
-							if(t.getPuntiClassifica()<p.getT1().getPuntiClassifica()) {
-								t.setReporter(t.getReporter()+nRep);
-								break;
-							}
+						t.setReporter(t.getReporter()+nRep);
 						}
 					}
 					break;
@@ -110,5 +113,22 @@ public class Simulator {
 		}
 		public int getPartiteSottoSoglia() {
 			return nPartiteSottoSoglia;
+		}
+		
+		private List<Team> getSquadreMigliori(Team team){
+			List<Team> result=new ArrayList<Team>();
+			for(DefaultWeightedEdge e:grafo.incomingEdgesOf(team))
+				result.add(grafo.getEdgeSource(e));
+			
+			Collections.sort(result);
+			return result;
+		}
+		
+		private List<Team> getSquadrePeggiori(Team team){
+			List<Team> result=new ArrayList<Team>();
+			for(DefaultWeightedEdge e:grafo.outgoingEdgesOf(team))
+				result.add(grafo.getEdgeTarget(e));
+			
+			return result;
 		}
 }
